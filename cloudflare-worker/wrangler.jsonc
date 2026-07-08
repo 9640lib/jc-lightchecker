@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "jc-downdetector-trigger",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-08",
+
+  "vars": {
+    "GITHUB_OWNER": "tzhaya",
+    "GITHUB_REPO": "jc-downdetector",
+    "GITHUB_WORKFLOW_FILE": "check.yml",
+    "GITHUB_REF": "main"
+  },
+
+  "triggers": {
+    "crons": [
+      "7,22,37,52 * * * *"
+    ]
+  }
+}
