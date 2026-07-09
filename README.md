@@ -1,80 +1,142 @@
 # JAIRO Cloud Light Checker
 
-JAIRO Cloud 上の機関リポジトリを対象に、トップページへの軽量な HTTP GET で状態を確認するための小さなチェックツールです。厳密な SLA 監視や負荷試験ではなく、自機関だけの問題か、複数機関でも似た遅延や障害が起きているかを判断する材料を残すことを目的にしています。
+JAIRO Cloud 上の機関リポジトリに対して、トップページへの軽量な HTTP GET を行い、応答状況を記録する小さな確認ツールです。
 
-## Files
+厳密な SLA 監視や負荷試験ではありません。複数サイトで同じような遅延や障害が起きているかを見比べるための、個人運用向けの簡易チェックとして作っています。
+
+## 現在の構成
 
 | Path | Role |
 | --- | --- |
 | `targets.yml` | 監視対象サイトの一覧 |
-| `scripts/check_jairo.py` | 軽量チェック処理 |
-| `scripts/analyze_history.py` | 履歴の応答時間分析 |
-| `.github/workflows/check.yml` | GitHub Actions の定期実行 |
-| `docs/latest.json` | 最新チェック結果 |
+| `scripts/check_jairo.py` | HTTP チェック本体 |
+| `scripts/analyze_history.py` | `docs/history.jsonl` の簡易集計 |
+| `.github/workflows/check.yml` | チェックを実行し、結果をコミットする GitHub Actions workflow |
+| `cloudflare-worker/` | GitHub Actions を定期起動する Cloudflare Worker |
+| `docs/latest.json` | 最新のチェック結果 |
 | `docs/history.jsonl` | チェック履歴 |
-| `docs/index.html` | GitHub Pages 向けダッシュボード |
+| `docs/index.html` | GitHub Pages 向けの静的ダッシュボード |
 
-## Usage
+## 使い方
+
+このプロジェクトの Python スクリプトは、現在は標準ライブラリだけで動作します。
 
 ```bash
 python -m pip install -r requirements.txt
 python scripts/check_jairo.py
 ```
 
-実行すると `docs/latest.json` が更新され、`docs/history.jsonl` に1行追記されます。対象サイトが遅い、落ちている、または通信エラーになる場合でも、チェック処理は原則として `exit 1` しません。
+実行すると `docs/latest.json` が更新され、`docs/history.jsonl` に1行追記されます。対象サイトが遅い、落ちている、通信エラーになる場合でも、情報提供用の記録を残すため、チェックスクリプト自体は原則として `exit 1` しません。
 
-## Targets
+## 監視対象
 
-初期状態では国際農研と農研機構を対象にしています。
+監視対象は `targets.yml` で管理します。現在は次の3サイトを対象にしています。
+
+| URL | 備考 |
+| --- | --- |
+| `https://jircas.repo.nii.ac.jp/` | JIRCAS 系リポジトリ |
+| `https://repository.naro.go.jp/` | 農研機構系リポジトリ |
+| `https://tsukuba.repo.nii.ac.jp/` | つくばリポジトリ |
+
+追加する場合は、同じ形式で `targets.yml` に `name`、`url`、`primary` を追加します。各サイトのトップページに対して、1回だけ軽量な GET を行います。
 
 ```yaml
 targets:
-  - name: 国際農研機関リポジトリ
-    url: https://jircas.repo.nii.ac.jp/
-    primary: true
-  - name: 農研機構機関リポジトリ
-    url: https://repository.naro.go.jp/
+  - name: example repository
+    url: https://example.repo.nii.ac.jp/
     primary: false
 ```
 
-複数サイトへ拡張する場合は、同じ形式で `targets.yml` に追加します。アクセス負荷を避けるため、各サイトのトップページへ順番に1回だけ GET します。
-
-## States
+## 判定ルール
 
 | State | Condition |
 | --- | --- |
-| `OK` | HTTP 200-399 and less than 5 seconds |
-| `SLOW` | HTTP 200-399 and 5 seconds or more |
-| `VERY_SLOW` | HTTP 200-399 and 15 seconds or more |
-| `SERVER_ERROR` | HTTP 500, 502, 503, or 504 |
-| `TIMEOUT` | No response within 20 seconds |
-| `UNKNOWN` | DNS, TLS, connection, or other unexpected errors |
+| `OK` | HTTP 200-399 かつ 5 秒未満 |
+| `SLOW` | HTTP 200-399 かつ 5 秒以上 |
+| `VERY_SLOW` | HTTP 200-399 かつ 15 秒以上 |
+| `SERVER_ERROR` | HTTP 500, 502, 503, 504 |
+| `TIMEOUT` | 20 秒以内に応答なし |
+| `UNKNOWN` | DNS、TLS、接続エラー、その他の予期しないエラー |
 
-初期閾値は `SLOW = 5秒`, `VERY_SLOW = 15秒`, `TIMEOUT = 20秒` です。実測値を1から2週間程度蓄積したあと、必要に応じて見直します。
+現在のしきい値は `SLOW = 5秒`、`VERY_SLOW = 15秒`、`TIMEOUT = 20秒` です。見直しメモは `docs/threshold_analysis.md` にあります。
 
-## Analyze History
+## 履歴分析
 
 ```bash
 python scripts/analyze_history.py
 ```
 
-`docs/history.jsonl` から p50 / p90 / p95 / p99 / 最大値と、`TIMEOUT` / `SERVER_ERROR` を含む状態別件数を Markdown 形式で出力します。
+`docs/history.jsonl` から、応答時間の p50 / p90 / p95 / p99 / 最大値と、状態別件数を Markdown 形式で出力します。別の履歴ファイルを指定することもできます。
+
+```bash
+python scripts/analyze_history.py path/to/history.jsonl
+```
+
+## ダッシュボード
+
+`docs/index.html` は `docs/latest.json` と `docs/history.jsonl` を読み込み、次の情報を表示します。
+
+- 最新チェック時刻
+- 全体サマリーと状態別件数
+- 対象サイトごとの HTTP ステータス、応答時間、判定、エラー内容
+- 12h / 24h / 7d / 30d / all の応答時間グラフ
+- 履歴の Records、Samples、p50、p95、Slow+ 件数
+
+GitHub Pages では `docs/` を公開対象にします。ローカルで確認する場合は、`docs/` で簡易サーバーを起動して開きます。
+
+```bash
+cd docs
+python -m http.server 8000
+```
+
+その後、`http://localhost:8000/` をブラウザで開きます。
 
 ## GitHub Actions
 
-`.github/workflows/check.yml` は以下に対応しています。
+`.github/workflows/check.yml` は `workflow_dispatch` で手動実行できます。実行内容は次の通りです。
 
-- `workflow_dispatch` による手動実行
-- 15分間隔の schedule 実行
-- `docs/latest.json` と `docs/history.jsonl` の自動コミット
+- Python 3.12 をセットアップ
+- `python scripts/check_jairo.py` を実行
+- `docs/latest.json` と `docs/history.jsonl` をコミット
+- 変更がない場合はコミットせず終了
 
-## Dashboard
+現在、GitHub Actions 側には `schedule` は設定していません。定期実行は Cloudflare Worker から `workflow_dispatch` を呼び出す構成です。
 
-`docs/index.html` は `docs/latest.json` を読み込み、対象サイト名、URL、HTTP ステータス、応答時間、判定結果、エラー内容を一覧表示します。GitHub Pages では `docs/` を公開対象にしてください。
+## Cloudflare Worker
 
-## AIの利用
+`cloudflare-worker/` には、GitHub Actions を定期起動する Worker があります。
 
-このアプリケーションの作成は、生成AIによるコーディング支援を受けています。
+- cron: `7,22,37,52 * * * *`
+- 手動トリガー: `/trigger`
+- 通常のヘルスチェック: `/trigger` 以外は `OK` を返す
+
+必要な環境変数は `cloudflare-worker/wrangler.jsonc` に定義されています。
+
+| Variable | Meaning |
+| --- | --- |
+| `GITHUB_OWNER` | GitHub owner |
+| `GITHUB_REPO` | GitHub repository |
+| `GITHUB_WORKFLOW_FILE` | 起動する workflow ファイル名 |
+| `GITHUB_REF` | 実行対象の ref |
+
+`GITHUB_TOKEN` は Worker secret として設定します。
+
+```bash
+cd cloudflare-worker
+npm ci
+npm run dev
+npm run deploy
+```
+
+## 更新履歴
+
+- 2026-07-09: README を現在の実装内容に合わせて再整理し、構成、実行方法、Cloudflare Worker、ダッシュボードの説明を更新。
+- 2026-07-08: Cloudflare Worker から GitHub Actions を定期起動する構成、複数サイトの履歴グラフ表示を追加。
+- 2026-07-07: 軽量 HTTP チェック、最新結果 JSON、履歴 JSONL、静的ダッシュボードの初期構成を作成。
+
+## AI の利用
+
+このアプリケーションの作成・更新では、生成 AI によるコーディング支援を利用しています。
 
 ## 作者
 
