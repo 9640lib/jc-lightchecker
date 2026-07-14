@@ -657,14 +657,15 @@
       </section>
 
       <section class="recent-errors" id="recentErrors" aria-labelledby="recentErrorsTitle" hidden>
-        <h2 id="recentErrorsTitle">過去7日間に検知したHTTPエラー</h2>
-        <p>過去7日間にサーバーが返した 500、502、503、504 エラーを集計しています。</p>
+        <h2 id="recentErrorsTitle">過去7日間に検知したHTTPエラー/Timeout</h2>
+        <p>過去7日間にサーバーが返した 500、502、503、504 エラーと、Timeout の発生回数を集計しています。</p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th scope="col">対象リポジトリ</th>
-                <th scope="col">件数</th>
+                <th scope="col">HTTPエラー件数</th>
+                <th scope="col">Timeout件数</th>
                 <th scope="col">直近の発生日時</th>
               </tr>
             </thead>
@@ -881,7 +882,9 @@
 
           for (const result of Array.isArray(record.results) ? record.results : []) {
             const statusCode = Number(result.status_code);
-            if (![500, 502, 503, 504].includes(statusCode)) {
+            const isHttpError = [500, 502, 503, 504].includes(statusCode);
+            const isTimeout = text(result.state, "UNKNOWN") === "TIMEOUT";
+            if (!isHttpError && !isTimeout) {
               continue;
             }
 
@@ -893,10 +896,16 @@
             const current = errorsByRepository.get(key) || {
               name: text(result.name, key),
               url: result.url || "",
-              count: 0,
+              errorCount: 0,
+              timeoutCount: 0,
               latestAt: 0,
             };
-            current.count += 1;
+            if (isHttpError) {
+              current.errorCount += 1;
+            }
+            if (isTimeout) {
+              current.timeoutCount += 1;
+            }
             current.latestAt = Math.max(current.latestAt, occurredAt);
             errorsByRepository.set(key, current);
           }
@@ -912,7 +921,8 @@
           return `
             <tr>
               <td>${repository}</td>
-              <td><strong>${error.count}</strong></td>
+              <td><strong>${error.errorCount}</strong></td>
+              <td><strong>${error.timeoutCount}</strong></td>
               <td><time datetime="${new Date(error.latestAt).toISOString()}">${escapeHtml(formatDateTime(error.latestAt))}</time></td>
             </tr>
           `;
