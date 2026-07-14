@@ -8,3 +8,9 @@ targets:
   - name: つくばリポジトリ
     url: https://tsukuba.repo.nii.ac.jp/
     primary: false
+  - name: ResearchMap(参考)
+    url: https://researchmap.jp/tzhaya
+    primary: false
+  - name: IRDB(参考)
+    url: https://irdb.nii.ac.jp/
+    primary: false
