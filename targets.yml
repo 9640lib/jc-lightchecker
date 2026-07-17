@@ -1,4 +1,16 @@
 targets:
-  - name: 琉球大学学術リポジトリ
+  - name: 琉球大学リポジトリ
     url: https://u-ryukyu.repo.nii.ac.jp/
+    primary: false
+  - name: 鹿児島大学リポジトリ
+    url: https://ir.kagoshima-u.ac.jp/
+    primary: false
+      - name: 富山大学リポジトリ
+    url: https://toyama.repo.nii.ac.jp/
+    primary: false
+      - name: IRDB(参考)
+    url: https://irdb.nii.ac.jp/
+    primary: false
+      - name: 九州大学リポジトリ(参考)
+    url: https://www.lib.kyushu-u.ac.jp/
     primary: false
