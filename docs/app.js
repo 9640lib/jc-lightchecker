@@ -269,12 +269,12 @@ function renderHistory() {
     </svg>
   `;
 
-  chartLegendEl.innerHTML = series.map((site, index) => `
-    <span class="legend-item">
-      <span class="legend-swatch legend-swatch--${index % seriesColors.length}"></span>
-      ${escapeHtml(site.name)}
-    </span>
-  `).join("");
+  chartLegendEl.innerHTML = series.map((site) => `
+      <span class="legend-item">
+        <span class="legend-swatch" style="background-color: ${site.color}"></span>
+        ${escapeHtml(site.name)}
+      </span>
+    `).join("");
   renderHistoryStats(values, records, series, slowSec);
 }
 
