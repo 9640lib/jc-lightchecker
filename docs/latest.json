@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-07-17T16:40:36+09:00",
+  "checked_at": "2026-07-17T16:43:49+09:00",
   "thresholds": {
     "slow_sec": 5,
     "very_slow_sec": 15,
@@ -10,10 +10,10 @@
     "message": "一部サイトで応答遅延または異常を確認しました。",
     "counts": {
       "OK": 4,
-      "SLOW": 1,
+      "SLOW": 0,
       "VERY_SLOW": 0,
       "SERVER_ERROR": 0,
-      "TIMEOUT": 0,
+      "TIMEOUT": 1,
       "UNKNOWN": 0
     },
     "total": 5,
@@ -25,8 +25,8 @@
       "url": "https://u-ryukyu.repo.nii.ac.jp/",
       "primary": false,
       "status_code": 200,
-      "elapsed_sec": 7.359,
-      "state": "SLOW",
+      "elapsed_sec": 0.955,
+      "state": "OK",
       "error_type": null,
       "error": null
     },
@@ -34,18 +34,18 @@
       "name": "鹿児島大学リポジトリ",
       "url": "https://ir.kagoshima-u.ac.jp/",
       "primary": false,
-      "status_code": 200,
-      "elapsed_sec": 1.767,
-      "state": "OK",
-      "error_type": null,
-      "error": null
+      "status_code": null,
+      "elapsed_sec": 20.354,
+      "state": "TIMEOUT",
+      "error_type": "timeout",
+      "error": "Request timed out after 20 seconds."
     },
     {
       "name": "富山大学リポジトリ",
       "url": "https://toyama.repo.nii.ac.jp/",
       "primary": false,
       "status_code": 200,
-      "elapsed_sec": 1.428,
+      "elapsed_sec": 1.027,
       "state": "OK",
       "error_type": null,
       "error": null
@@ -55,7 +55,7 @@
       "url": "https://irdb.nii.ac.jp/",
       "primary": false,
       "status_code": 200,
-      "elapsed_sec": 1.439,
+      "elapsed_sec": 0.96,
       "state": "OK",
       "error_type": null,
       "error": null
@@ -65,7 +65,7 @@
       "url": "https://www.lib.kyushu-u.ac.jp/",
       "primary": false,
       "status_code": 200,
-      "elapsed_sec": 1.564,
+      "elapsed_sec": 1.257,
       "state": "OK",
       "error_type": null,
       "error": null
