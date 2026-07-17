@@ -1,22 +1,4 @@
 targets:
-  - name: 国際農研機関リポジトリ
-    url: https://jircas.repo.nii.ac.jp/
-    primary: false
-  - name: 農研機構機関リポジトリ
-    url: https://repository.naro.go.jp/
-    primary: false
-  - name: つくばリポジトリ
-    url: https://tsukuba.repo.nii.ac.jp/
-    primary: false
-  - name: 情報学広場
-    url: https://ipsj.ixsq.nii.ac.jp/
-    primary: false
-  - name: ResearchMap(参考)
-    url: https://researchmap.jp/
-    primary: false
-  - name: IRDB(参考)
-    url: https://irdb.nii.ac.jp/
-    primary: false
-  - name: AgriKnowledge(参考)
-    url: https://agriknowledge.affrc.go.jp/
+  - name: 琉球大学学術リポジトリ
+    url: https://u-ryukyu.repo.nii.ac.jp/
     primary: false
