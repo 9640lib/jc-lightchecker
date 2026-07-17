@@ -1,16 +1,16 @@
 {
-  "checked_at": "2026-07-17T16:19:42+09:00",
+  "checked_at": "2026-07-17T16:40:36+09:00",
   "thresholds": {
     "slow_sec": 5,
     "very_slow_sec": 15,
     "timeout_sec": 20
   },
   "summary": {
-    "level": "OK",
-    "message": "大きな異常は確認されていません。",
+    "level": "SLOW",
+    "message": "一部サイトで応答遅延または異常を確認しました。",
     "counts": {
-      "OK": 5,
-      "SLOW": 0,
+      "OK": 4,
+      "SLOW": 1,
       "VERY_SLOW": 0,
       "SERVER_ERROR": 0,
       "TIMEOUT": 0,
@@ -25,8 +25,8 @@
       "url": "https://u-ryukyu.repo.nii.ac.jp/",
       "primary": false,
       "status_code": 200,
-      "elapsed_sec": 1.199,
-      "state": "OK",
+      "elapsed_sec": 7.359,
+      "state": "SLOW",
       "error_type": null,
       "error": null
     },
@@ -35,7 +35,7 @@
       "url": "https://ir.kagoshima-u.ac.jp/",
       "primary": false,
       "status_code": 200,
-      "elapsed_sec": 1.337,
+      "elapsed_sec": 1.767,
       "state": "OK",
       "error_type": null,
       "error": null
@@ -45,7 +45,7 @@
       "url": "https://toyama.repo.nii.ac.jp/",
       "primary": false,
       "status_code": 200,
-      "elapsed_sec": 1.438,
+      "elapsed_sec": 1.428,
       "state": "OK",
       "error_type": null,
       "error": null
@@ -55,7 +55,7 @@
       "url": "https://irdb.nii.ac.jp/",
       "primary": false,
       "status_code": 200,
-      "elapsed_sec": 1.808,
+      "elapsed_sec": 1.439,
       "state": "OK",
       "error_type": null,
       "error": null
@@ -65,7 +65,7 @@
       "url": "https://www.lib.kyushu-u.ac.jp/",
       "primary": false,
       "status_code": 200,
-      "elapsed_sec": 1.859,
+      "elapsed_sec": 1.564,
       "state": "OK",
       "error_type": null,
       "error": null
