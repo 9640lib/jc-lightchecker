@@ -163,9 +163,11 @@ function buildSeries(records) {
       });
     }
   }
-  return [...sites.values()].map((site, index) => ({
+return [...sites.values()].map((site, index) => ({
     ...site,
-    color: seriesColors[index % seriesColors.length],
+    color: site.name === "琉球大学学術リポジトリ"
+      ? "#f0b300"
+      : seriesColors[index % seriesColors.length],
     points: site.points.sort((a, b) => a.time - b.time),
   }));
 }
