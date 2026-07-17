@@ -17,7 +17,7 @@ const ranges = {
   "30d": 30 * 24 * 60 * 60 * 1000,
   all: null,
 };
-const seriesColors = ["#1a5fb4", "#16845b", "#b64f0a", "#7b3f98", "#007d8a", "#b04566"];
+const seriesColors = ["#f0b300", "#16845b", "#b64f0a", "#7b3f98", "#007d8a", "#b04566"];
 let historyRecords = [];
 let activeRange = "12h";
 
