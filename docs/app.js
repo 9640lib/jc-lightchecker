@@ -218,7 +218,12 @@ function renderHistory() {
   const x = (time) => margin.left + ((time - minTime) / timeSpan) * plotWidth;
   const y = (value) => margin.top + plotHeight - (value / yMax) * plotHeight;
   const yTicks = Array.from({ length: 5 }, (_, index) => (yMax / 4) * index);
-  const xTicks = Array.from({ length: 4 }, (_, index) => minTime + (timeSpan / 3) * index);
+  const uniqueTimes = [...new Set(records.map((record) => record.checkedAtDate.getTime()))].sort((a, b) => a - b);
+  const tickCount = Math.min(4, uniqueTimes.length);
+  const xTicks = Array.from({ length: tickCount }, (_, index) => {
+    const pos = tickCount === 1 ? 0 : Math.round((uniqueTimes.length - 1) * (index / (tickCount - 1)));
+    return uniqueTimes[pos];
+  });
   const thresholdLines = [
     { label: "SLOW", value: slowSec, color: "#9a6a00" },
     { label: "VERY_SLOW", value: verySlowSec, color: "#b64f0a" },
